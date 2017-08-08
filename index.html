@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="metaviewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>夏目友人帐精美壁纸</title>
+    <style>
+        *{ margin:0; padding:0; box-sizing: border-box; }
+        *::before{ box-sizing: border-box; }
+        *::after{ box-sizing: border-box; }
+        .container{
+            background: url('https://i.loli.net/2017/08/08/5989d1fb21dfb.png') no-repeat;
+            background-position: 50% 100%;
+        	padding: 30px;
+        	text-align: center;
+        }
+    	.title{
+    		display: block;
+    		margin: 0 auto;
+    	}
+    	.content{
+    		margin: 20px auto;
+    	}
+    	ol,ul{ list-style: none; }
+    	#list{
+    		max-width: 1060px;
+    		margin: 0 auto;
+    		display: flex;
+    		flex-wrap: wrap;
+    		justify-content: space-between;
+    	}
+    	#list > li {
+    		width: calc(33.333333% - 10px);
+    	}
+    	#list > li img{
+    		width: 100%;
+            border: 2px solid #000;
+            border-radius: 4px;
+    	}
+    	.btn {
+    		border: none;
+			background: #9af078;
+			background-image: linear-gradient(to bottom, #9af078, #2cb890);
+			border-radius: 28px;
+			font-family: Arial;
+			color: #ffffff;
+			font-size: 16px;
+			padding: 10px 20px 10px 20px;
+			text-decoration: none;
+		}
+		.btn:hover {
+		    background: #3cdffc;
+		    background-image: linear-gradient(to bottom, #3cdffc, #3476d9);
+		    text-decoration: none;
+		}
+        .oneToOne{
+            overflow: hidden;
+            position: relative;
+        }
+        .footer{
+            height: 200px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+        <img class="title" src="https://i.loli.net/2017/08/08/5989d14436935.png" alt="夏目友人帐">
+        <div class="content">
+            <ol id="list">
+            </ol>
+        </div>
+        <button class="btn" id="loadMoreButton">加载更多</button>
+        <div clas="footer"></div>
+    </div>
+
+    <script>
+    	var list = document.getElementById('list')
+    	var arrImgs = ['https://images2.alphacoders.com/557/thumb-350-557146.jpg',
+    	               'https://images8.alphacoders.com/744/thumb-350-744872.png',
+    	               'https://images2.alphacoders.com/160/thumb-350-160560.jpg',
+    	               'https://images.alphacoders.com/744/thumb-350-744842.png',
+    	               'https://images4.alphacoders.com/744/thumb-350-744877.jpg',
+    	               'https://images4.alphacoders.com/764/thumb-350-764324.jpg',
+    	               'https://images4.alphacoders.com/723/thumb-350-723753.jpg',
+    	               'https://images4.alphacoders.com/744/thumb-350-744868.png',
+    	               'https://images4.alphacoders.com/176/thumb-350-176756.jpg'] 
+    	for(var i=0; i<arrImgs.length; i++){
+    		var li = document.createElement('li')
+    		var image = document.createElement('img')
+    		image.src = arrImgs[i]
+            var div = document.createElement('div')
+            div.className = 'oneToOne'
+            div.appendChild(image)
+    		var p = document.createElement('p')
+    		p.textContent = `图${i+1}`
+    		li.appendChild(div)
+    		li.appendChild(p)
+    		list.appendChild(li)
+    	}
+        var n = 1
+    	loadMoreButton.onclick = function(){
+    		var request = new XMLHttpRequest()
+    		request.open('GET',`./page${n+1}.html`)
+    		request.onload = function(){
+                n +=1
+                var response = request.responseText
+                var data = window.JSON.parse(response)
+                for(var i=0; i<data.content.length; i++){
+                    var liString = `
+                    <li>
+                      <div class=oneToOne>
+                        <img src="${data.content[i].url}">
+                      </div>
+                      <p>${data.content[i].text}</p>
+                    </li>
+                    `
+                list.insertAdjacentHTML('beforeend',liString) 
+                }
+                if(data.hasNextPage === false){
+                    loadMoreButton.disabled = true
+                    loadMoreButton.textContent = '加载完毕'
+                }   			
+    		}
+    		request.send()
+    	}
+    var autoLoad = loadMoreButton.onclick 
+    window.onscroll = function(){
+    var doc = document.documentElement;
+    var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+    var clientHeight = doc.clientHeight
+    var viewportOffset = loadMoreButton.getBoundingClientRect();
+  // these are relative to the viewport, i.e. the window
+    var buttonTop = viewportOffset.top;
+    if(buttonTop > clientHeight - 70){
+    }else{
+    autoLoad()
+  }
+}
+    </script>
+  </body>
+</html>
