@@ -105,6 +105,7 @@
         var hasNext = true
         var loading = false
     	loadMoreButton.onclick = function(){
+            if(loading){return}
             if(!hasNext){return}
     		var request = new XMLHttpRequest()
     		request.open('GET',`./page${n+1}.html`)
