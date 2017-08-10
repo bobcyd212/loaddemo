@@ -32,10 +32,15 @@
     	#list > li {
     		width: calc(33.333333% - 10px);
     	}
+        .oneToOne{
+            overflow: hidden;
+            position: relative;
+        }
     	#list > li img{
-    		width: 100%;
+    		max-width: 100%;
             border: 2px solid #000;
             border-radius: 4px;
+            position: 100%;
     	}
     	.btn {
     		border: none;
@@ -53,41 +58,36 @@
 		    background-image: linear-gradient(to bottom, #3cdffc, #3476d9);
 		    text-decoration: none;
 		}
-        .oneToOne{
-            overflow: hidden;
-            position: relative;
-        }
-        .footer{
-            height: 200px;
-        }
     </style>
   </head>
   <body>
     <div class="container">
-        <img class="title" src="https://i.loli.net/2017/08/08/5989d14436935.png" alt="夏目友人帐">
+        <img class="title" src="https://i.loli.net/2017/08/10/598bdf9b614db.png" alt="夏目友人帐">
         <div class="content">
             <ol id="list">
             </ol>
         </div>
         <button class="btn" id="loadMoreButton">加载更多</button>
-        <div clas="footer"></div>
     </div>
 
     <script>
+        var loadingImage = new Image()
+        Image.src = 'https://i.loli.net/2017/08/10/598be03d1678a.gif'
     	var list = document.getElementById('list')
-    	var arrImgs = ['https://images2.alphacoders.com/557/thumb-350-557146.jpg',
-    	               'https://images8.alphacoders.com/744/thumb-350-744872.png',
-    	               'https://images2.alphacoders.com/160/thumb-350-160560.jpg',
-    	               'https://images.alphacoders.com/744/thumb-350-744842.png',
-    	               'https://images4.alphacoders.com/744/thumb-350-744877.jpg',
-    	               'https://images4.alphacoders.com/764/thumb-350-764324.jpg',
-    	               'https://images4.alphacoders.com/723/thumb-350-723753.jpg',
-    	               'https://images4.alphacoders.com/744/thumb-350-744868.png',
-    	               'https://images4.alphacoders.com/176/thumb-350-176756.jpg'] 
+    	var arrImgs = ['https://i.loli.net/2017/08/10/598be483530ae.jpg',
+    	               'https://i.loli.net/2017/08/10/598be55178b97.png',
+    	               'https://i.loli.net/2017/08/10/598be575cc8dd.jpg',
+    	               'https://i.loli.net/2017/08/10/598be5c0219d5.png',
+    	               'https://i.loli.net/2017/08/10/598be600885af.jpg',
+    	               'https://i.loli.net/2017/08/10/598be62003ead.jpg',
+    	               'https://i.loli.net/2017/08/10/598be63b15b1b.jpg',
+    	               'https://i.loli.net/2017/08/10/598be65978864.png',
+    	               'https://i.loli.net/2017/08/10/598be69996154.jpg'] 
     	for(var i=0; i<arrImgs.length; i++){
     		var li = document.createElement('li')
     		var image = document.createElement('img')
     		image.src = arrImgs[i]
+            image.setAttribute('data-url','https://i.loli.net/2017/08/10/598be03d1678a.gif')
             var div = document.createElement('div')
             div.className = 'oneToOne'
             div.appendChild(image)
@@ -98,10 +98,17 @@
     		list.appendChild(li)
     	}
         var n = 1
+        var hasNext = true
+        var loading = false
     	loadMoreButton.onclick = function(){
+            if(!hasNext){return}
     		var request = new XMLHttpRequest()
     		request.open('GET',`./page${n+1}.html`)
+            request.onerror = function(){
+                loading = false
+            }
     		request.onload = function(){
+                loading = false
                 n +=1
                 var response = request.responseText
                 var data = window.JSON.parse(response)
@@ -109,7 +116,7 @@
                     var liString = `
                     <li>
                       <div class=oneToOne>
-                        <img src="${data.content[i].url}">
+                        <img src="https://i.loli.net/2017/08/10/598be03d1678a.gif" data-xxx="${data.content[i].url}">
                       </div>
                       <p>${data.content[i].text}</p>
                     </li>
@@ -117,25 +124,43 @@
                 list.insertAdjacentHTML('beforeend',liString) 
                 }
                 if(data.hasNextPage === false){
-                    loadMoreButton.disabled = true
+                    hasNext = false
                     loadMoreButton.textContent = '加载完毕'
                 }   			
     		}
+            loading = true
     		request.send()
     	}
     var autoLoad = loadMoreButton.onclick 
     window.onscroll = function(){
-    var doc = document.documentElement;
-    var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
-    var clientHeight = doc.clientHeight
-    var viewportOffset = loadMoreButton.getBoundingClientRect();
-  // these are relative to the viewport, i.e. the window
-    var buttonTop = viewportOffset.top;
-    if(buttonTop > clientHeight - 70){
-    }else{
-    autoLoad()
-  }
-}
+        if(showElement(loadMoreButton)){
+            if(hasNext){     
+               autoLoad()
+           }
+       
+        }
+        var images = document.querySelectorAll('img[data-xxx]')
+        for(var i=0;i<images.length;i++){
+        if(showElement(images[i])){
+            images[i].src = images[i].getAttribute('data-xxx')
+            images[i].removeAttribute('data-xxx')
+        }
+        }
+    }
+
+    function showElement(element){
+        var doc = document.documentElement;
+        var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+        var clientHeight = doc.clientHeight
+        var viewportOffset = element.getBoundingClientRect();
+      // these are relative to the viewport, i.e. the window
+        var imgTop = viewportOffset.top;
+        if(imgTop <= clientHeight){
+            return true
+        }else{
+            return false
+        }
+    }
     </script>
   </body>
 </html>
